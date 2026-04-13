@@ -84,6 +84,7 @@ export default async function ProductPage({ params }: Props) {
       product={pricedProduct}
       region={region}
       countryCode={params.countryCode}
+      images={pricedProduct.images}
     />
   )
 }
