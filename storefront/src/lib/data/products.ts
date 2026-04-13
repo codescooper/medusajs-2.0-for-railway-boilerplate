@@ -138,3 +138,6 @@ export const getProductsListWithSort = cache(async function ({
     queryParams,
   }
 })
+
+// Alias for compatibility with other code
+export const listProductsWithSort = getProductsListWithSort

@@ -1,4 +1,4 @@
-import { Radio as RadioGroupOption } from "@headlessui/react"
+import { RadioGroup } from "@headlessui/react"
 import { Text, clx } from "@medusajs/ui"
 import React, { useContext, useMemo, type JSX } from "react"
 
@@ -30,7 +30,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   const isSelected = selectedPaymentOptionId === paymentProviderId
 
   return (
-    <RadioGroupOption
+    <RadioGroup.Option
       key={paymentProviderId}
       value={paymentProviderId}
       disabled={disabled}
@@ -69,7 +69,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
       )}
 
       {children}
-    </RadioGroupOption>
+    </RadioGroup.Option>
   )
 }
 

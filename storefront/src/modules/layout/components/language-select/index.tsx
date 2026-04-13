@@ -2,9 +2,6 @@
 
 import {
   Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
   Transition,
 } from "@headlessui/react"
 import { Fragment, useEffect, useMemo, useState, useTransition } from "react"
@@ -122,7 +119,7 @@ const LanguageSelect = ({
         disabled={isPending}
       >
         {/* BUTTON */}
-        <ListboxButton className="w-full rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-left text-sm text-white/75 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08]">
+        <Listbox.Button className="w-full rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-left text-sm text-white/75 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08]">
           <div className="flex items-center gap-x-2">
             <span className="text-white/55">Langue :</span>
 
@@ -139,7 +136,7 @@ const LanguageSelect = ({
               </span>
             )}
           </div>
-        </ListboxButton>
+        </Listbox.Button>
 
         {/* DROPDOWN */}
         <div className="relative flex w-full min-w-[320px]">
@@ -150,7 +147,7 @@ const LanguageSelect = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ListboxOptions
+            <Listbox.Options
               className="absolute left-0 z-[900] mt-2 max-h-[442px] w-full overflow-y-scroll rounded-[1.25rem] border border-white/10 bg-[#0B0F19]/95 p-2 text-sm text-white shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl no-scrollbar xsmall:left-auto xsmall:right-0"
               static
             >
@@ -158,7 +155,7 @@ const LanguageSelect = ({
                 const isActive = current?.code === o.code
 
                 return (
-                  <ListboxOption
+                  <Listbox.Option
                     key={o.code || "default"}
                     value={o}
                     className={({ active }) =>
@@ -184,10 +181,10 @@ const LanguageSelect = ({
                     )}
 
                     {o.localizedName}
-                  </ListboxOption>
+                  </Listbox.Option>
                 )
               })}
-            </ListboxOptions>
+            </Listbox.Options>
           </Transition>
         </div>
       </Listbox>

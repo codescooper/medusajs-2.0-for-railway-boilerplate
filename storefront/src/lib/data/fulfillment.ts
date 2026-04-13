@@ -1,5 +1,6 @@
 import { sdk } from "@lib/config"
 import { cache } from "react"
+import { HttpTypes } from "@medusajs/types"
 
 // Shipping actions
 export const listCartShippingMethods = cache(async function (cartId: string) {
@@ -10,3 +11,25 @@ export const listCartShippingMethods = cache(async function (cartId: string) {
       return null
     })
 })
+
+export const calculatePriceForShippingOption = async (
+  optionId: string,
+  cartId: string,
+  data?: Record<string, unknown>
+) => {
+  return sdk.store.fulfillment
+    .calculateOptionPrice(
+      { cart_id: cartId, option_id: optionId, data },
+      { next: { tags: ["shipping"] } }
+    )
+    .then((response) => {
+      // Extract the shipping option from the response
+      if (response && "shipping_option" in response) {
+        return response.shipping_option
+      }
+      return response
+    })
+    .catch(() => {
+      return null
+    })
+}

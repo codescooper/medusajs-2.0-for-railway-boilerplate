@@ -48,3 +48,15 @@ export const removeCartId = async () => {
   const cookiesStore = await cookies()
   cookiesStore.set("_medusa_cart_id", "", { maxAge: -1 })
 }
+
+export const getCacheTag = (tag: string): string => {
+  return tag
+}
+
+export const getCacheOptions = async (
+  tag: string
+): Promise<{ tags: string[] }> => {
+  return {
+    tags: [tag],
+  }
+}

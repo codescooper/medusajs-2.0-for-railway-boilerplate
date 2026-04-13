@@ -1,6 +1,6 @@
 "use client"
 
-import { Popover, PopoverPanel, Transition } from "@headlessui/react"
+import { Popover, Transition } from "@headlessui/react"
 import { ArrowRightMini, XMark } from "@medusajs/icons"
 import { Text, clx, useToggleState } from "@medusajs/ui"
 import { Fragment } from "react"
@@ -55,7 +55,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0 translate-x-[-20px]"
               >
-                <PopoverPanel className="absolute left-0 top-0 z-[51] h-[calc(100vh-1rem)] w-full sm:w-1/3 2xl:w-1/4 m-2">
+                <Popover.Panel className="absolute left-0 top-0 z-[51] h-[calc(100vh-1rem)] w-full sm:w-1/3 2xl:w-1/4 m-2">
 
                   <div className="flex h-full flex-col justify-between rounded-[2rem] border border-white/10 bg-[#0B0F19]/90 p-6 text-white backdrop-blur-2xl shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
 
@@ -134,7 +134,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                       </Text>
                     </div>
                   </div>
-                </PopoverPanel>
+                </Popover.Panel>
               </Transition>
             </>
           )}

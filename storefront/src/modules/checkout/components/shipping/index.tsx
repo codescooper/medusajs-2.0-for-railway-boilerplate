@@ -1,6 +1,6 @@
 "use client"
 
-import { Radio, RadioGroup } from "@headlessui/react"
+import { RadioGroup } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
@@ -227,7 +227,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       }
                     }}
                   >
-                    <Radio
+                    <RadioGroup.Option
                       value={PICKUP_OPTION_ON}
                       data-testid="delivery-option-radio"
                       className={clx(
@@ -249,7 +249,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       </div>
 
                       <span className="justify-self-end text-white/60">-</span>
-                    </Radio>
+                    </RadioGroup.Option>
                   </RadioGroup>
                 )}
 
@@ -268,7 +268,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       typeof calculatedPricesMap[option.id] !== "number"
 
                     return (
-                      <Radio
+                      <RadioGroup.Option
                         key={option.id}
                         value={option.id}
                         data-testid="delivery-option-radio"
@@ -309,7 +309,7 @@ const Shipping: React.FC<ShippingProps> = ({
                             "-"
                           )}
                         </span>
-                      </Radio>
+                      </RadioGroup.Option>
                     )
                   })}
                 </RadioGroup>
@@ -338,7 +338,7 @@ const Shipping: React.FC<ShippingProps> = ({
                   >
                     {pickupMethods?.map((option) => {
                       return (
-                        <Radio
+                        <RadioGroup.Option
                           key={option.id}
                           value={option.id}
                           disabled={option.insufficient_inventory}
@@ -376,7 +376,7 @@ const Shipping: React.FC<ShippingProps> = ({
                               currency_code: cart.currency_code,
                             })}
                           </span>
-                        </Radio>
+                        </RadioGroup.Option>
                       )
                     })}
                   </RadioGroup>
