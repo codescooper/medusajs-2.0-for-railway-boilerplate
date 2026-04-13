@@ -23,6 +23,7 @@ const AddressSelect = ({
 }: AddressSelectProps) => {
   const handleSelect = (id: string) => {
     const savedAddress = addresses.find((a) => a.id === id)
+
     if (savedAddress) {
       onSelect(savedAddress as HttpTypes.StoreCartAddress)
     }
@@ -36,19 +37,20 @@ const AddressSelect = ({
     <Listbox onChange={handleSelect} value={selectedAddress?.id}>
       <div className="relative">
         <Listbox.Button
-          className="relative w-full flex justify-between items-center px-4 py-[10px] text-left bg-white cursor-default focus:outline-none border rounded-rounded focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-gray-300 focus-visible:ring-offset-2 focus-visible:border-gray-300 text-base-regular"
+          className="relative flex w-full cursor-default items-center justify-between rounded-[1rem] border border-white/10 bg-white/[0.05] px-4 py-[14px] text-left text-sm text-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07] focus:outline-none"
           data-testid="shipping-address-select"
         >
           {({ open }) => (
             <>
-              <span className="block truncate">
+              <span className="block truncate text-white/75">
                 {selectedAddress
                   ? selectedAddress.address_1
-                  : "Choose an address"}
+                  : "Choisir une adresse"}
               </span>
+
               <ChevronUpDown
-                className={clx("transition-rotate duration-200", {
-                  "transform rotate-180": open,
+                className={clx("text-white/45 transition duration-200", {
+                  "rotate-180 transform": open,
                 })}
               />
             </>
@@ -61,41 +63,58 @@ const AddressSelect = ({
           leaveTo="opacity-0"
         >
           <Listbox.Options
-            className="absolute z-20 w-full overflow-auto text-small-regular bg-white border border-top-0 max-h-60 focus:outline-none sm:text-sm"
+            className="absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-[1.25rem] border border-white/10 bg-[#0B0F19]/95 p-2 text-sm text-white shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl focus:outline-none"
             data-testid="shipping-address-options"
           >
             {addresses.map((address) => {
+              const isSelected = selectedAddress?.id === address.id
+
               return (
                 <Listbox.Option
                   key={address.id}
                   value={address.id}
-                  className="cursor-default select-none relative pl-6 pr-10 hover:bg-gray-50 py-4"
+                  className={({ active }) =>
+                    clx(
+                      "relative cursor-pointer select-none rounded-[1rem] px-4 py-4 transition-all duration-200",
+                      "border border-transparent",
+                      {
+                        "bg-white/[0.04] border-white/10": !active && !isSelected,
+                        "bg-white/[0.06] border-white/15": active && !isSelected,
+                        "bg-white/[0.08] border-cyan-300/30": isSelected,
+                      }
+                    )
+                  }
                   data-testid="shipping-address-option"
                 >
-                  <div className="flex gap-x-4 items-start">
+                  <div className="flex items-start gap-x-4">
                     <Radio
-                      checked={selectedAddress?.id === address.id}
+                      checked={isSelected}
                       data-testid="shipping-address-radio"
                     />
+
                     <div className="flex flex-col">
-                      <span className="text-left text-base-semi">
+                      <span className="text-left text-sm font-semibold text-white">
                         {address.first_name} {address.last_name}
                       </span>
+
                       {address.company && (
-                        <span className="text-small-regular text-ui-fg-base">
+                        <span className="mt-1 text-sm text-white/55">
                           {address.company}
                         </span>
                       )}
-                      <div className="flex flex-col text-left text-base-regular mt-2">
+
+                      <div className="mt-2 flex flex-col text-left text-sm text-white/60">
                         <span>
                           {address.address_1}
                           {address.address_2 && (
                             <span>, {address.address_2}</span>
                           )}
                         </span>
+
                         <span>
                           {address.postal_code}, {address.city}
                         </span>
+
                         <span>
                           {address.province && `${address.province}, `}
                           {address.country_code?.toUpperCase()}

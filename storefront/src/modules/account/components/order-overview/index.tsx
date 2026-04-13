@@ -9,13 +9,13 @@ import { HttpTypes } from "@medusajs/types"
 const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
   if (orders?.length) {
     return (
-      <div className="flex flex-col gap-y-8 w-full">
-        {orders.map((o) => (
+      <div className="flex w-full flex-col gap-y-5">
+        {orders.map((order) => (
           <div
-            key={o.id}
-            className="border-b border-gray-200 pb-6 last:pb-0 last:border-none"
+            key={order.id}
+            className="pb-1"
           >
-            <OrderCard order={o} />
+            <OrderCard order={order} />
           </div>
         ))}
       </div>
@@ -24,17 +24,34 @@ const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-y-4"
+      className="flex w-full flex-col items-center gap-y-5 rounded-[1.75rem] border border-white/10 bg-white/[0.04] px-6 py-10 text-center backdrop-blur-xl"
       data-testid="no-orders-container"
     >
-      <h2 className="text-large-semi">Nothing to see here</h2>
-      <p className="text-base-regular">
-        You don&apos;t have any orders yet, let us change that {":)"}
+      <span className="eyebrow-lgv">Commandes</span>
+
+      <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.03em] text-white">
+        Aucune commande pour le moment
+      </h2>
+
+      <p className="max-w-md text-sm leading-7 text-white/55 md:text-base">
+        Vous n'avez pas encore passé de commande. Découvrez notre sélection
+        et trouvez la monture qui vous correspond.
       </p>
-      <div className="mt-4">
+
+      <div className="mt-2">
         <LocalizedClientLink href="/" passHref>
-          <Button data-testid="continue-shopping-button">
-            Continue shopping
+          <Button
+            data-testid="continue-shopping-button"
+            className="
+              rounded-full
+              bg-gradient-to-r from-cyan-400 to-blue-500
+              font-semibold text-black
+              transition-all duration-300
+              hover:scale-[1.01]
+              hover:shadow-lg hover:shadow-cyan-500/20
+            "
+          >
+            Continuer mes achats
           </Button>
         </LocalizedClientLink>
       </div>

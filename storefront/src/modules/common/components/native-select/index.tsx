@@ -17,11 +17,12 @@ export type NativeSelectProps = {
 
 const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
   (
-    { placeholder = "Select...", defaultValue, className, children, ...props },
+    { placeholder = "Sélectionner", defaultValue, className, children, ...props },
     ref
   ) => {
     const innerRef = useRef<HTMLSelectElement>(null)
     const [isPlaceholder, setIsPlaceholder] = useState(false)
+    const [isFocused, setIsFocused] = useState(false)
 
     useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
       ref,
@@ -37,32 +38,56 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
     }, [innerRef.current?.value])
 
     return (
-      <div>
+      <div className="w-full">
         <div
-          onFocus={() => innerRef.current?.focus()}
-          onBlur={() => innerRef.current?.blur()}
           className={clx(
-            "relative flex items-center text-base-regular border border-ui-border-base bg-ui-bg-subtle rounded-md hover:bg-ui-bg-field-hover",
-            className,
+            "relative flex h-14 w-full items-center rounded-[1rem] border bg-white/[0.05] shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-xl transition-all duration-300",
+            "border-white/10 hover:border-white/20 hover:bg-white/[0.07]",
             {
-              "text-ui-fg-muted": isPlaceholder,
-            }
+              "border-cyan-300/30 bg-white/[0.08] shadow-[0_10px_28px_rgba(0,0,0,0.18)]":
+                isFocused,
+              "text-white/40": isPlaceholder,
+              "text-white": !isPlaceholder,
+            },
+            className
           )}
         >
           <select
             ref={innerRef}
             defaultValue={defaultValue}
             {...props}
-            className="appearance-none flex-1 bg-transparent border-none px-4 py-2.5 transition-colors duration-150 outline-none "
+            onFocus={(e) => {
+              setIsFocused(true)
+              props.onFocus?.(e)
+            }}
+            onBlur={(e) => {
+              setIsFocused(false)
+              props.onBlur?.(e)
+            }}
+            onChange={(e) => {
+              setIsPlaceholder(e.target.value === "")
+              props.onChange?.(e)
+            }}
+            className={clx(
+              "h-full w-full appearance-none bg-transparent border-none px-4 pr-11 text-sm outline-none transition-colors duration-150",
+              "focus:outline-none focus:ring-0",
+              {
+                "text-white/40": isPlaceholder,
+                "text-white": !isPlaceholder,
+              }
+            )}
           >
             <option disabled value="">
               {placeholder}
             </option>
             {children}
           </select>
-          <span className="absolute right-4 inset-y-0 flex items-center pointer-events-none ">
+
+          <span className="pointer-events-none absolute right-4 inset-y-0 flex items-center text-white/40 transition-colors duration-200">
             <ChevronUpDown />
           </span>
+
+          <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         </div>
       </div>
     )

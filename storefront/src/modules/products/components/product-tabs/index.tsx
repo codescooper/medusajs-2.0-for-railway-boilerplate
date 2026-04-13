@@ -14,17 +14,17 @@ type ProductTabsProps = {
 const ProductTabs = ({ product }: ProductTabsProps) => {
   const tabs = [
     {
-      label: "Product Information",
+      label: "Informations produit",
       component: <ProductInfoTab product={product} />,
     },
     {
-      label: "Shipping & Returns",
+      label: "Livraison & retours",
       component: <ShippingInfoTab />,
     },
   ]
 
   return (
-    <div className="w-full">
+    <div className="w-full text-white">
       <Accordion type="multiple">
         {tabs.map((tab, i) => (
           <Accordion.Item
@@ -43,33 +43,64 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
 
 const ProductInfoTab = ({ product }: ProductTabsProps) => {
   return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-2 gap-x-8">
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Material</span>
-            <p>{product.material ? product.material : "-"}</p>
+    <div className="py-6 text-sm text-white/70">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="flex flex-col gap-y-5">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Matière
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
+              {product.material ? product.material : "-"}
+            </p>
           </div>
-          <div>
-            <span className="font-semibold">Country of origin</span>
-            <p>{product.origin_country ? product.origin_country : "-"}</p>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Pays d'origine
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
+              {product.origin_country ? product.origin_country : "-"}
+            </p>
           </div>
-          <div>
-            <span className="font-semibold">Type</span>
-            <p>{product.type ? product.type.value : "-"}</p>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Type
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
+              {product.type ? product.type.value : "-"}
+            </p>
           </div>
         </div>
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Weight</span>
-            <p>{product.weight ? `${product.weight} g` : "-"}</p>
+
+        <div className="flex flex-col gap-y-5">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Poids
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
+              {product.weight ? `${product.weight} g` : "-"}
+            </p>
           </div>
-          <div>
-            <span className="font-semibold">Dimensions</span>
-            <p>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Dimensions
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
               {product.length && product.width && product.height
-                ? `${product.length}L x ${product.width}W x ${product.height}H`
+                ? `${product.length}L x ${product.width}l x ${product.height}H`
                 : "-"}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <span className="text-xs uppercase tracking-[0.14em] text-cyan-300/80">
+              Confort visuel
+            </span>
+            <p className="mt-2 text-sm font-medium text-white">
+              Pensé pour allier élégance, maintien et confort au quotidien.
             </p>
           </div>
         </div>
@@ -80,36 +111,49 @@ const ProductInfoTab = ({ product }: ProductTabsProps) => {
 
 const ShippingInfoTab = () => {
   return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-1 gap-y-8">
-        <div className="flex items-start gap-x-2">
-          <FastDelivery />
+    <div className="py-6 text-sm text-white/70">
+      <div className="grid grid-cols-1 gap-y-5">
+        <div className="flex items-start gap-x-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mt-0.5 text-cyan-300/90">
+            <FastDelivery />
+          </div>
           <div>
-            <span className="font-semibold">Fast delivery</span>
-            <p className="max-w-sm">
-              Your package will arrive in 3-5 business days at your pick up
-              location or in the comfort of your home.
+            <span className="text-sm font-semibold text-white">
+              Livraison rapide
+            </span>
+            <p className="mt-2 max-w-sm leading-6 text-white/65">
+              Votre commande est préparée avec soin et livrée dans les meilleurs
+              délais selon votre zone.
             </p>
           </div>
         </div>
-        <div className="flex items-start gap-x-2">
-          <Refresh />
+
+        <div className="flex items-start gap-x-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mt-0.5 text-cyan-300/90">
+            <Refresh />
+          </div>
           <div>
-            <span className="font-semibold">Simple exchanges</span>
-            <p className="max-w-sm">
-              Is the fit not quite right? No worries - we&apos;ll exchange your
-              product for a new one.
+            <span className="text-sm font-semibold text-white">
+              Échanges simplifiés
+            </span>
+            <p className="mt-2 max-w-sm leading-6 text-white/65">
+              Si le produit ne correspond pas parfaitement à vos attentes,
+              nous vous accompagnons pour trouver une solution adaptée.
             </p>
           </div>
         </div>
-        <div className="flex items-start gap-x-2">
-          <Back />
+
+        <div className="flex items-start gap-x-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mt-0.5 text-cyan-300/90">
+            <Back />
+          </div>
           <div>
-            <span className="font-semibold">Easy returns</span>
-            <p className="max-w-sm">
-              Just return your product and we&apos;ll refund your money. No
-              questions asked – we&apos;ll do our best to make sure your return
-              is hassle-free.
+            <span className="text-sm font-semibold text-white">
+              Retours faciles
+            </span>
+            <p className="mt-2 max-w-sm leading-6 text-white/65">
+              En cas de besoin, notre équipe vous guide dans le processus de
+              retour pour une expérience simple et rassurante.
             </p>
           </div>
         </div>

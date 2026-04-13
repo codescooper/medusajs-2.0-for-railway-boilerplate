@@ -1,7 +1,7 @@
-import Product from "../product-preview"
 import { getRegion } from "@lib/data/regions"
 import { getProductsList } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
+import Product from "../product-preview"
 
 type RelatedProductsProps = {
   product: HttpTypes.StoreProduct
@@ -23,7 +23,7 @@ export default async function RelatedProducts({
   const region = await getRegion(countryCode)
 
   if (!region) {
-  const queryParams: StoreProductParamsWithTags = {}
+    return null
   }
 
   // edit this function to define your related products logic
@@ -56,23 +56,27 @@ export default async function RelatedProducts({
   }
 
   return (
-    <div className="product-page-constraint">
-      <div className="flex flex-col items-center text-center mb-16">
-        <span className="text-base-regular text-gray-600 mb-6">
-          Related products
-        </span>
-        <p className="text-2xl-regular text-ui-fg-base max-w-lg">
-          You might also want to check out these products.
+    <section className="relative">
+      <div className="mb-8 md:mb-10 flex flex-col items-center text-center">
+        <span className="eyebrow-lgv">Sélection complémentaire</span>
+
+        <h2 className="section-title-lgv max-w-[14ch]">
+          Vous pourriez aussi aimer
+        </h2>
+
+        <p className="section-subtitle-lgv mt-4 max-w-2xl">
+          D'autres modèles sélectionnés dans le même esprit de confort,
+          d'élégance et de précision visuelle.
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8">
+      <ul className="grid grid-cols-2 gap-5 small:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
-          <li key={product.id}>
-            {region && <Product region={region} product={product} />}
+          <li key={product.id} className="animate-reveal-up">
+            <Product region={region} product={product} />
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   )
 }

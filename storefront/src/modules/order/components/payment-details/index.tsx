@@ -1,6 +1,6 @@
 import { Container, Heading, Text } from "@medusajs/ui"
 
-import { isStripe, paymentInfoMap } from "@lib/constants"
+import { isStripeLike, paymentInfoMap } from "@lib/constants"
 import Divider from "@modules/common/components/divider"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -10,42 +10,50 @@ type PaymentDetailsProps = {
 }
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
-  const payment = order.payment_collections?.[0].payments?.[0]
+  const payment = order.payment_collections?.[0]?.payments?.[0]
 
   return (
-    <div>
-      <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
-        Payment
+    <div className="text-white">
+      <Heading
+        level="h2"
+        className="mb-5 text-2xl font-semibold tracking-[-0.03em] text-white md:text-3xl"
+      >
+        Paiement
       </Heading>
+
       <div>
         {payment && (
-          <div className="flex items-start gap-x-1 w-full">
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_2fr]">
+            <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4 md:p-5">
+              <Text className="mb-2 text-xs uppercase tracking-[0.18em] text-cyan-300/75">
+                Méthode
               </Text>
+
               <Text
-                className="txt-medium text-ui-fg-subtle"
+                className="text-sm text-white/75"
                 data-testid="payment-method"
               >
-                {paymentInfoMap[payment.provider_id].title}
+                {paymentInfoMap[payment.provider_id]?.title || payment.provider_id}
               </Text>
             </div>
-            <div className="flex flex-col w-2/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment details
+
+            <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4 md:p-5">
+              <Text className="mb-2 text-xs uppercase tracking-[0.18em] text-cyan-300/75">
+                Détails
               </Text>
-              <div className="flex gap-2 txt-medium text-ui-fg-subtle items-center">
-                <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                  {paymentInfoMap[payment.provider_id].icon}
+
+              <div className="flex items-center gap-3 text-sm text-white/70">
+                <Container className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] p-2 text-white/80">
+                  {paymentInfoMap[payment.provider_id]?.icon}
                 </Container>
-                <Text data-testid="payment-amount">
-                  {isStripe(payment.provider_id) && payment.data?.card_last4
+
+                <Text data-testid="payment-amount" className="text-sm text-white/70">
+                  {isStripeLike(payment.provider_id) && payment.data?.card_last4
                     ? `**** **** **** ${payment.data.card_last4}`
                     : `${convertToLocale({
                         amount: payment.amount,
                         currency_code: order.currency_code,
-                      })} paid at ${new Date(
+                      })} payé le ${new Date(
                         payment.created_at ?? ""
                       ).toLocaleString()}`}
                 </Text>

@@ -30,23 +30,62 @@ export default async function ProductPreview({
   })
 
   return (
-    <LocalizedClientLink href={`/products/${product.handle}`} className="group">
-      <div data-testid="product-wrapper">
-        <Thumbnail
-          thumbnail={product.thumbnail}
-          images={product.images}
-          size="full"
-          isFeatured={isFeatured}
-        />
-        <div className="flex txt-compact-medium mt-4 justify-between">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">
-            {product.title}
-          </Text>
-          <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+    <LocalizedClientLink
+      href={`/products/${product.handle}`}
+      className="group block"
+    >
+      <article
+        data-testid="product-wrapper"
+        className="product-card-lgv h-full"
+      >
+        <div className="relative">
+          <Thumbnail
+            thumbnail={product.thumbnail}
+            images={product.images}
+            size="full"
+            isFeatured={isFeatured}
+          />
+
+          {product.collection && (
+            <div className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-black/40 px-3 py-1 backdrop-blur-xl">
+              <span className="text-[10px] uppercase tracking-[0.16em] text-cyan-200/90">
+                {product.collection.title}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="pt-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <Text
+                className="text-base md:text-lg font-medium tracking-[-0.02em] text-white transition duration-300 group-hover:text-cyan-200"
+                data-testid="product-title"
+              >
+                {product.title}
+              </Text>
+
+              <p className="mt-2 text-sm leading-6 text-white/50">
+                Élégance, confort et précision visuelle.
+              </p>
+            </div>
+
+            <div className="shrink-0 text-right">
+              {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+            </div>
+          </div>
+
+          <div className="mt-5 flex items-center justify-between">
+            <span className="text-xs uppercase tracking-[0.16em] text-white/40">
+              Voir le produit
+            </span>
+
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition-all duration-300 group-hover:border-cyan-300/30 group-hover:bg-cyan-400/10 group-hover:text-cyan-200">
+              →
+            </span>
           </div>
         </div>
-      </div>
+      </article>
     </LocalizedClientLink>
   )
 }

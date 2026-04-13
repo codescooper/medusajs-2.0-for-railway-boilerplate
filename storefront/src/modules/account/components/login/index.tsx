@@ -1,40 +1,49 @@
-import { useFormState } from "react-dom"
-
+import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import Input from "@modules/common/components/input"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { login } from "@lib/data/customer"
+import Input from "@modules/common/components/input"
+import { useActionState } from "react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
 }
 
 const Login = ({ setCurrentView }: Props) => {
-  const [message, formAction] = useFormState(login, null)
+  const [message, formAction] = useActionState(login, null)
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center"
+      className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:p-8"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
-      </p>
+      <div className="mb-8 text-center">
+        <span className="eyebrow-lgv">Espace client</span>
+
+        <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.03em] text-white">
+          Heureux de vous revoir
+        </h1>
+
+        <p className="mt-4 text-sm md:text-base leading-7 text-white/65">
+          Connectez-vous pour retrouver votre compte, suivre vos commandes
+          et profiter d'une expérience d'achat plus fluide.
+        </p>
+      </div>
+
       <form className="w-full" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex w-full flex-col gap-y-3">
           <Input
             label="Email"
             name="email"
             type="email"
-            title="Enter a valid email address."
+            title="Entrez une adresse email valide."
             autoComplete="email"
             required
             data-testid="email-input"
           />
+
           <Input
-            label="Password"
+            label="Mot de passe"
             name="password"
             type="password"
             autoComplete="current-password"
@@ -42,22 +51,40 @@ const Login = ({ setCurrentView }: Props) => {
             data-testid="password-input"
           />
         </div>
-        <ErrorMessage error={message} data-testid="login-error-message" />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          Sign in
+
+        <div className="mt-4">
+          <ErrorMessage error={message} data-testid="login-error-message" />
+        </div>
+
+        <SubmitButton
+          data-testid="sign-in-button"
+          className="
+            mt-6 w-full rounded-full
+            bg-gradient-to-r from-cyan-400 to-blue-500
+            font-semibold text-black
+            transition-all duration-300
+            hover:scale-[1.01]
+            hover:shadow-lg hover:shadow-cyan-500/20
+          "
+        >
+          Se connecter
         </SubmitButton>
       </form>
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
-        <button
-          onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
-          data-testid="register-button"
-        >
-          Join us
-        </button>
-        .
-      </span>
+
+      <div className="mt-6 border-t border-white/10 pt-5 text-center">
+        <span className="text-sm text-white/55">
+          Pas encore de compte ?{" "}
+          <button
+            onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
+            className="font-medium text-cyan-200 underline underline-offset-4 transition hover:text-cyan-100"
+            data-testid="register-button"
+            type="button"
+          >
+            Créer un compte
+          </button>
+          .
+        </span>
+      </div>
     </div>
   )
 }

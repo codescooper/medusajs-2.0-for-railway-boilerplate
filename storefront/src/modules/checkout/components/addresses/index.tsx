@@ -1,16 +1,14 @@
 "use client"
 
-import { CheckCircleSolid } from "@medusajs/icons"
-import { Heading, Text, useToggleState } from "@medusajs/ui"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-
-import Divider from "@modules/common/components/divider"
-import Spinner from "@modules/common/icons/spinner"
-
 import { setAddresses } from "@lib/data/cart"
 import compareAddresses from "@lib/util/compare-addresses"
+import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { useFormState } from "react-dom"
+import { Heading, Text, useToggleState } from "@medusajs/ui"
+import Divider from "@modules/common/components/divider"
+import Spinner from "@modules/common/icons/spinner"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useActionState } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
@@ -31,7 +29,7 @@ const Addresses = ({
 
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
     cart?.shipping_address && cart?.billing_address
-      ? compareAddresses(cart?.shipping_address, cart?.billing_address)
+      ? compareAddresses(cart.shipping_address, cart.billing_address)
       : true
   )
 
@@ -39,146 +37,101 @@ const Addresses = ({
     router.push(pathname + "?step=address")
   }
 
-  const [message, formAction] = useFormState(setAddresses, null)
+  const [message, formAction] = useActionState(setAddresses, null)
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
-        >
-          Shipping Address
-          {!isOpen && <CheckCircleSolid />}
+    <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.03] p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.2)] backdrop-blur-xl md:p-6">
+
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-6">
+        <Heading className="text-xl md:text-2xl font-semibold tracking-[-0.02em] flex items-center gap-2">
+          Adresse de livraison
+          {!isOpen && <CheckCircleSolid className="text-emerald-400" />}
         </Heading>
+
         {!isOpen && cart?.shipping_address && (
-          <Text>
-            <button
-              onClick={handleEdit}
-              className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="edit-address-button"
-            >
-              Edit
-            </button>
-          </Text>
+          <button
+            onClick={handleEdit}
+            className="text-sm text-white/50 hover:text-white transition"
+            data-testid="edit-address-button"
+          >
+            Modifier
+          </button>
         )}
       </div>
+
       {isOpen ? (
         <form action={formAction}>
-          <div className="pb-8">
-            <ShippingAddress
-              customer={customer}
-              checked={sameAsBilling}
-              onChange={toggleSameAsBilling}
-              cart={cart}
-            />
+          <div className="space-y-6">
+            <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4">
+              <ShippingAddress
+                customer={customer}
+                checked={sameAsBilling}
+                onChange={toggleSameAsBilling}
+                cart={cart}
+              />
+            </div>
 
             {!sameAsBilling && (
-              <div>
-                <Heading
-                  level="h2"
-                  className="text-3xl-regular gap-x-4 pb-6 pt-8"
-                >
-                  Billing address
+              <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4">
+                <Heading className="mb-4 text-lg text-white">
+                  Adresse de facturation
                 </Heading>
-
                 <BillingAddress cart={cart} />
               </div>
             )}
-            <SubmitButton className="mt-6" data-testid="submit-address-button">
-              Continue to delivery
+
+            <SubmitButton
+              className="mt-4 w-full rounded-full bg-white text-black hover:bg-white/90"
+              data-testid="submit-address-button"
+            >
+              Continuer vers la livraison
             </SubmitButton>
-            <ErrorMessage error={message} data-testid="address-error-message" />
+
+            <ErrorMessage error={message} />
           </div>
         </form>
       ) : (
-        <div>
-          <div className="text-small-regular">
-            {cart && cart.shipping_address ? (
-              <div className="flex items-start gap-x-8">
-                <div className="flex items-start gap-x-1 w-full">
-                  <div
-                    className="flex flex-col w-1/3"
-                    data-testid="shipping-address-summary"
-                  >
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Shipping Address
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.first_name}{" "}
-                      {cart.shipping_address.last_name}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.address_1}{" "}
-                      {cart.shipping_address.address_2}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.postal_code},{" "}
-                      {cart.shipping_address.city}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.country_code?.toUpperCase()}
-                    </Text>
-                  </div>
+        <div className="text-sm text-white/70">
+          {cart?.shipping_address ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-                  <div
-                    className="flex flex-col w-1/3 "
-                    data-testid="shipping-contact-summary"
-                  >
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Contact
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.phone}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.email}
-                    </Text>
-                  </div>
-
-                  <div
-                    className="flex flex-col w-1/3"
-                    data-testid="billing-address-summary"
-                  >
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Billing Address
-                    </Text>
-
-                    {sameAsBilling ? (
-                      <Text className="txt-medium text-ui-fg-subtle">
-                        Billing- and delivery address are the same.
-                      </Text>
-                    ) : (
-                      <>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.first_name}{" "}
-                          {cart.billing_address?.last_name}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.address_1}{" "}
-                          {cart.billing_address?.address_2}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.postal_code},{" "}
-                          {cart.billing_address?.city}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.country_code?.toUpperCase()}
-                        </Text>
-                      </>
-                    )}
-                  </div>
-                </div>
+              <div className="rounded-[1rem] border border-white/10 bg-white/[0.04] p-3">
+                <p className="text-white text-xs mb-2">Livraison</p>
+                <p>{cart.shipping_address.first_name} {cart.shipping_address.last_name}</p>
+                <p>{cart.shipping_address.address_1}</p>
+                <p>{cart.shipping_address.city}</p>
+                <p>{cart.shipping_address.country_code?.toUpperCase()}</p>
               </div>
-            ) : (
-              <div>
-                <Spinner />
+
+              <div className="rounded-[1rem] border border-white/10 bg-white/[0.04] p-3">
+                <p className="text-white text-xs mb-2">Contact</p>
+                <p>{cart.shipping_address.phone}</p>
+                <p>{cart.email}</p>
               </div>
-            )}
-          </div>
+
+              <div className="rounded-[1rem] border border-white/10 bg-white/[0.04] p-3">
+                <p className="text-white text-xs mb-2">Facturation</p>
+
+                {sameAsBilling ? (
+                  <p>Même que livraison</p>
+                ) : (
+                  <>
+                    <p>{cart.billing_address?.first_name} {cart.billing_address?.last_name}</p>
+                    <p>{cart.billing_address?.address_1}</p>
+                    <p>{cart.billing_address?.city}</p>
+                  </>
+                )}
+              </div>
+
+            </div>
+          ) : (
+            <Spinner />
+          )}
         </div>
       )}
-      <Divider className="mt-8" />
+
+      <Divider className="mt-6 opacity-30" />
     </div>
   )
 }

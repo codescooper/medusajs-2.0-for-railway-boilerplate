@@ -27,8 +27,12 @@ const Accordion: React.FC<AccordionProps> & {
   Item: React.FC<AccordionItemProps>
 } = ({ children, ...props }) => {
   return (
-    /* x@ts-expect-error */
-    <AccordionPrimitive.Root {...props}>{children}</AccordionPrimitive.Root>
+    <AccordionPrimitive.Root
+      {...props}
+      className="flex flex-col gap-4"
+    >
+      {children}
+    </AccordionPrimitive.Root>
   )
 }
 
@@ -41,48 +45,66 @@ const Item: React.FC<AccordionItemProps> = ({
   headingSize = "large",
   customTrigger = undefined,
   forceMountContent = undefined,
-  triggerable,
   ...props
 }) => {
   return (
-    /* x@ts-expect-error */
     <AccordionPrimitive.Item
       {...props}
       className={clx(
-        "border-grey-20 group border-t last:mb-0 last:border-b",
-        "py-3",
+        "group overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl transition-all duration-300",
+        "hover:border-white/20 hover:bg-white/[0.06]",
         className
       )}
     >
-      {/* x@ts-expect-error */}
-      <AccordionPrimitive.Header className="px-1">
+      <AccordionPrimitive.Header className="px-4 md:px-5">
         <div className="flex flex-col">
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Text className="text-ui-fg-subtle text-sm">{title}</Text>
+          <div className="flex w-full items-center justify-between gap-4 py-4">
+            <div className="flex min-w-0 flex-1 flex-col">
+              <Text
+                className={clx(
+                  "tracking-[-0.02em] text-white",
+                  headingSize === "small" && "text-sm font-medium",
+                  headingSize === "medium" && "text-base font-medium",
+                  headingSize === "large" && "text-lg font-semibold"
+                )}
+              >
+                {title}
+              </Text>
+
+              {subtitle && (
+                <Text
+                  as="span"
+                  size="small"
+                  className="mt-1 text-white/55"
+                >
+                  {subtitle}
+                </Text>
+              )}
             </div>
-            {/* x@ts-expect-error */}
-            <AccordionPrimitive.Trigger>
+
+            <AccordionPrimitive.Trigger className="shrink-0">
               {customTrigger || <MorphingTrigger />}
             </AccordionPrimitive.Trigger>
           </div>
-          {subtitle && (
-            <Text as="span" size="small" className="mt-1">
-              {subtitle}
-            </Text>
-          )}
         </div>
       </AccordionPrimitive.Header>
-      {/* x@ts-expect-error */}
+
       <AccordionPrimitive.Content
         forceMount={forceMountContent}
         className={clx(
-          "radix-state-closed:animate-accordion-close radix-state-open:animate-accordion-open radix-state-closed:pointer-events-none px-1"
+          "overflow-hidden radix-state-closed:animate-accordion-close radix-state-open:animate-accordion-open"
         )}
       >
-        <div className="inter-base-regular group-radix-state-closed:animate-accordion-close">
-          {description && <Text>{description}</Text>}
-          <div className="w-full">{children}</div>
+        <div className="border-t border-white/10 px-4 pb-5 pt-4 md:px-5">
+          {description && (
+            <Text className="mb-4 text-sm leading-6 text-white/65">
+              {description}
+            </Text>
+          )}
+
+          <div className="w-full text-white/75">
+            {children}
+          </div>
         </div>
       </AccordionPrimitive.Content>
     </AccordionPrimitive.Item>
@@ -93,11 +115,28 @@ Accordion.Item = Item
 
 const MorphingTrigger = () => {
   return (
-    <div className="text-grey-90 hover:bg-grey-5 active:bg-grey-5 active:text-violet-60 focus:border-violet-60 disabled:text-grey-30 bg-transparent disabled:bg-transparent rounded-rounded group relative p-[6px]">
-      <div className="h-5 w-5">
-        <span className="bg-grey-50 rounded-circle group-radix-state-open:rotate-90 absolute inset-y-[31.75%] left-[48%] right-1/2 w-[1.5px] duration-300" />
-        <span className="bg-grey-50 rounded-circle group-radix-state-open:rotate-90 group-radix-state-open:left-1/2 group-radix-state-open:right-1/2 absolute inset-x-[31.75%] top-[48%] bottom-1/2 h-[1.5px] duration-300" />
-      </div>
+    <div
+      className="
+        relative flex h-10 w-10 items-center justify-center
+        rounded-full border border-white/10 bg-white/[0.06]
+        backdrop-blur-xl transition-all duration-300
+        hover:border-cyan-300/30 hover:bg-white/[0.10]
+      "
+    >
+      <span
+        className="
+          absolute h-[1.5px] w-4 rounded-full bg-white/80
+          transition-all duration-300
+        "
+      />
+      <span
+        className="
+          absolute h-4 w-[1.5px] rounded-full bg-white/80
+          transition-all duration-300
+          group-data-[state=open]:rotate-90
+          group-data-[state=open]:scale-y-0
+        "
+      />
     </div>
   )
 }

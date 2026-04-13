@@ -1,10 +1,9 @@
 "use client"
 
-import { clx } from "@medusajs/ui"
+import { clx, Button } from "@medusajs/ui"
 import { ArrowRightOnRectangle } from "@medusajs/icons"
 import { useParams, usePathname } from "next/navigation"
 
-import ChevronDown from "@modules/common/icons/chevron-down"
 import User from "@modules/common/icons/user"
 import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
@@ -25,173 +24,105 @@ const AccountNav = ({
   }
 
   return (
-    <div>
-      <div className="small:hidden" data-testid="mobile-account-nav">
-        {route !== `/${countryCode}/account` ? (
-          <LocalizedClientLink
-            href="/account"
-            className="flex items-center gap-x-2 text-small-regular py-2"
-            data-testid="account-main-link"
-          >
-            <>
-              <ChevronDown className="transform rotate-90" />
-              <span>Account</span>
-            </>
-          </LocalizedClientLink>
-        ) : (
-          <>
-            <div className="text-xl-semi mb-4 px-8">
-              Hello {customer?.first_name}
-            </div>
-            <div className="text-base-regular">
-              <ul>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/profile"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="profile-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <User size={20} />
-                        <span>Profile</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/addresses"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="addresses-link"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <MapPin size={20} />
-                        <span>Addresses</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <LocalizedClientLink
-                    href="/account/orders"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                    data-testid="orders-link"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <Package size={20} />
-                      <span>Orders</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </LocalizedClientLink>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
-                    onClick={handleLogout}
-                    data-testid="logout-button"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <ArrowRightOnRectangle />
-                      <span>Log out</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </>
-        )}
+    <div
+      className="
+        rounded-2xl
+        border border-white/10
+        bg-white/[0.04]
+        backdrop-blur-xl
+        p-6
+      "
+      data-testid="account-nav"
+    >
+      {/* HEADER */}
+      <div className="mb-6">
+        <p className="text-xs uppercase tracking-[0.18em] text-white/50">
+          Mon espace
+        </p>
+        <h3 className="text-xl font-semibold text-white mt-1">
+          {customer?.first_name || "Client"}
+        </h3>
       </div>
-      <div className="hidden small:block" data-testid="account-nav">
-        <div>
-          <div className="pb-4">
-            <h3 className="text-base-semi">Account</h3>
-          </div>
-          <div className="text-base-regular">
-            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-              <li>
-                <AccountNavLink
-                  href="/account"
-                  route={route!}
-                  data-testid="overview-link"
-                >
-                  Overview
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/profile"
-                  route={route!}
-                  data-testid="profile-link"
-                >
-                  Profile
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/addresses"
-                  route={route!}
-                  data-testid="addresses-link"
-                >
-                  Addresses
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink
-                  href="/account/orders"
-                  route={route!}
-                  data-testid="orders-link"
-                >
-                  Orders
-                </AccountNavLink>
-              </li>
-              <li className="text-grey-700">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  data-testid="logout-button"
-                >
-                  Log out
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
+
+      {/* NAV */}
+      <div className="flex flex-col gap-2">
+
+        <NavItem
+          href="/account"
+          route={route!}
+          icon={<User size={18} />}
+          label="Vue générale"
+        />
+
+        <NavItem
+          href="/account/profile"
+          route={route!}
+          icon={<User size={18} />}
+          label="Profil"
+        />
+
+        <NavItem
+          href="/account/addresses"
+          route={route!}
+          icon={<MapPin size={18} />}
+          label="Adresses"
+        />
+
+        <NavItem
+          href="/account/orders"
+          route={route!}
+          icon={<Package size={18} />}
+          label="Commandes"
+        />
+
+        {/* LOGOUT */}
+        <button
+          onClick={handleLogout}
+          className="
+            mt-4 flex items-center gap-3
+            text-sm text-white/60
+            hover:text-red-400
+            transition
+          "
+        >
+          <ArrowRightOnRectangle />
+          Déconnexion
+        </button>
       </div>
     </div>
   )
 }
 
-type AccountNavLinkProps = {
-  href: string
-  route: string
-  children: React.ReactNode
-  "data-testid"?: string
-}
-
-const AccountNavLink = ({
+const NavItem = ({
   href,
   route,
-  children,
-  "data-testid": dataTestId,
-}: AccountNavLinkProps) => {
+  icon,
+  label,
+}: {
+  href: string
+  route: string
+  icon: React.ReactNode
+  label: string
+}) => {
   const { countryCode }: { countryCode: string } = useParams()
 
   const active = route.split(countryCode)[1] === href
+
   return (
     <LocalizedClientLink
       href={href}
-      className={clx("text-ui-fg-subtle hover:text-ui-fg-base", {
-        "text-ui-fg-base font-semibold": active,
-      })}
-      data-testid={dataTestId}
+      className={clx(
+        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+        {
+          "bg-gradient-to-r from-cyan-400/20 to-blue-500/20 text-white":
+            active,
+          "text-white/60 hover:bg-white/[0.05] hover:text-white":
+            !active,
+        }
+      )}
     >
-      {children}
+      {icon}
+      <span className="text-sm font-medium">{label}</span>
     </LocalizedClientLink>
   )
 }

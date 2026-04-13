@@ -5,7 +5,7 @@ import React from "react"
 type OptionSelectProps = {
   option: HttpTypes.StoreProductOption
   current: string | undefined
-  updateOption: (title: string, value: string) => void
+  updateOption: (optionId: string, value: string) => void
   title: string
   disabled: boolean
   "data-testid"?: string
@@ -19,30 +19,47 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   "data-testid": dataTestId,
   disabled,
 }) => {
-  const filteredOptions = option.values?.map((v) => v.value)
+  const filteredOptions = (option.values ?? []).map((v) => v.value)
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
+    <div className="flex flex-col gap-y-4 text-white">
+      <div className="flex items-center justify-between">
+        <span className="text-xs uppercase tracking-[0.16em] text-cyan-300/80">
+          {title}
+        </span>
+
+        {current && (
+          <span className="text-xs text-white/45">
+            Sélection : <span className="text-white/75">{current}</span>
+          </span>
+        )}
+      </div>
+
       <div
-        className="flex flex-wrap justify-between gap-2"
+        className="flex flex-wrap gap-2"
         data-testid={dataTestId}
       >
-        {filteredOptions?.map((v) => {
+        {filteredOptions.map((v) => {
+          const isActive = v === current
+
           return (
             <button
-              onClick={() => updateOption(option.title ?? "", v ?? "")}
+              type="button"
+              onClick={() => updateOption(option.id, v)}
               key={v}
-              className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
-                {
-                  "border-ui-border-interactive": v === current,
-                  "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                    v !== current,
-                }
-              )}
               disabled={disabled}
               data-testid="option-button"
+              className={clx(
+                "min-h-11 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ease-out",
+                "border backdrop-blur-xl",
+                {
+                  "border-cyan-300/40 bg-cyan-400/10 text-cyan-200 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]":
+                    isActive,
+                  "border-white/10 bg-white/[0.05] text-white/75 hover:border-white/20 hover:bg-white/[0.08] hover:text-white":
+                    !isActive,
+                  "cursor-not-allowed opacity-40": disabled,
+                }
+              )}
             >
               {v}
             </button>

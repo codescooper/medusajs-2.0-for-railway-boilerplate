@@ -1,9 +1,9 @@
 "use client"
 
 import { Heading, Text, clx } from "@medusajs/ui"
+import { useSearchParams } from "next/navigation"
 
 import PaymentButton from "../payment-button"
-import { useSearchParams } from "next/navigation"
 
 const Review = ({ cart }: { cart: any }) => {
   const searchParams = useSearchParams()
@@ -19,33 +19,41 @@ const Review = ({ cart }: { cart: any }) => {
     (cart.payment_collection || paidByGiftcard)
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
+    <div className="rounded-[1.75rem] border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.03] p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl md:p-6">
+      <div className="mb-6 flex flex-row items-center justify-between">
         <Heading
           level="h2"
           className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
+            "flex flex-row items-baseline gap-x-2 text-2xl font-semibold tracking-[-0.03em] text-white md:text-3xl",
             {
-              "opacity-50 pointer-events-none select-none": !isOpen,
+              "pointer-events-none select-none opacity-50": !isOpen,
             }
           )}
         >
-          Review
+          Vérification finale
         </Heading>
       </div>
+
       {isOpen && previousStepsCompleted && (
         <>
-          <div className="flex items-start gap-x-1 w-full mb-6">
+          <div className="mb-6 w-full rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4 md:p-5">
             <div className="w-full">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                By clicking the Place Order button, you confirm that you have
-                read, understand and accept our Terms of Use, Terms of Sale and
-                Returns Policy and acknowledge that you have read Medusa
-                Store&apos;s Privacy Policy.
+              <Text className="mb-2 text-xs uppercase tracking-[0.18em] text-cyan-300/75">
+                Confirmation
+              </Text>
+
+              <Text className="text-sm leading-relaxed text-white/65">
+                En cliquant sur le bouton de validation, vous confirmez avoir
+                lu et accepté nos conditions d'utilisation, nos conditions de
+                vente, notre politique de retour ainsi que notre politique de
+                confidentialité.
               </Text>
             </div>
           </div>
-          <PaymentButton cart={cart} data-testid="submit-order-button" />
+
+          <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-4 md:p-5">
+            <PaymentButton cart={cart} data-testid="submit-order-button" />
+          </div>
         </>
       )}
     </div>

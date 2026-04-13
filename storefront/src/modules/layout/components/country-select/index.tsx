@@ -1,6 +1,12 @@
 "use client"
 
-import { Listbox, Transition } from "@headlessui/react"
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Transition,
+} from "@headlessui/react"
 import { Fragment, useEffect, useMemo, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
 
@@ -8,6 +14,7 @@ import { StateType } from "@lib/hooks/use-toggle-state"
 import { useParams, usePathname } from "next/navigation"
 import { updateRegion } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
+import { clx } from "@medusajs/ui"
 
 type CountryOption = {
   country: string
@@ -33,13 +40,13 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
 
   const options = useMemo(() => {
     return regions
-      ?.map((r) => {
-        return r.countries?.map((c) => ({
+      ?.map((r) =>
+        r.countries?.map((c) => ({
           country: c.iso_2,
           region: r.id,
           label: c.display_name,
         }))
-      })
+      )
       .flat()
       .sort((a, b) => (a?.label ?? "").localeCompare(b?.label ?? ""))
   }, [regions])
@@ -67,11 +74,13 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
             : undefined
         }
       >
-        <Listbox.Button className="py-1 w-full">
-          <div className="txt-compact-small flex items-start gap-x-2">
-            <span>Shipping to:</span>
+        <ListboxButton className="w-full rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-left text-sm text-white/75 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08]">
+          <div className="flex items-center gap-x-2">
+            <span className="text-white/55">Livraison :</span>
+
             {current && (
-              <span className="txt-compact-small flex items-center gap-x-2">
+              <span className="flex items-center gap-x-2 text-white">
+                {/* @ts-ignore */}
                 <ReactCountryFlag
                   svg
                   style={{
@@ -84,8 +93,9 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
               </span>
             )}
           </div>
-        </Listbox.Button>
-        <div className="flex relative w-full min-w-[320px]">
+        </ListboxButton>
+
+        <div className="relative flex w-full min-w-[320px]">
           <Transition
             show={state}
             as={Fragment}
@@ -93,17 +103,30 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options
-              className="absolute -bottom-[calc(100%-36px)] left-0 xsmall:left-auto xsmall:right-0 max-h-[442px] overflow-y-scroll z-[900] bg-white drop-shadow-md text-small-regular uppercase text-black no-scrollbar rounded-rounded w-full"
+            <ListboxOptions
+              className="absolute left-0 z-[900] mt-2 max-h-[442px] w-full overflow-y-scroll rounded-[1.25rem] border border-white/10 bg-[#0B0F19]/95 p-2 text-sm text-white shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl no-scrollbar xsmall:left-auto xsmall:right-0"
               static
             >
-              {options?.map((o, index) => {
+              {options?.map((o) => {
+                const isActive = current?.country === o?.country
+
                 return (
-                  <Listbox.Option
-                    key={index}
+                  <ListboxOption
+                    key={o?.country}
                     value={o}
-                    className="py-2 hover:bg-gray-200 px-3 cursor-pointer flex items-center gap-x-2"
+                    className={({ active }) =>
+                      clx(
+                        "flex cursor-pointer items-center gap-x-2 rounded-[1rem] px-3 py-3 text-sm transition-all duration-200",
+                        {
+                          "bg-white/[0.04] text-white/75": !active && !isActive,
+                          "bg-white/[0.06] text-white": active && !isActive,
+                          "border border-cyan-300/30 bg-white/[0.08] text-white":
+                            isActive,
+                        }
+                      )
+                    }
                   >
+                    {/* @ts-ignore */}
                     <ReactCountryFlag
                       svg
                       style={{
@@ -111,12 +134,12 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
                         height: "16px",
                       }}
                       countryCode={o?.country ?? ""}
-                    />{" "}
+                    />
                     {o?.label}
-                  </Listbox.Option>
+                  </ListboxOption>
                 )
               })}
-            </Listbox.Options>
+            </ListboxOptions>
           </Transition>
         </div>
       </Listbox>

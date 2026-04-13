@@ -1,5 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import { Text } from "@medusajs/ui"
+import { clx } from "@medusajs/ui"
 
 type LineItemOptionsProps = {
   variant: HttpTypes.StoreProductVariant | undefined
@@ -12,14 +12,27 @@ const LineItemOptions = ({
   "data-testid": dataTestid,
   "data-value": dataValue,
 }: LineItemOptionsProps) => {
+  if (!variant?.title) return null
+
   return (
-    <Text
+    <div
       data-testid={dataTestid}
       data-value={dataValue}
-      className="inline-block txt-medium text-ui-fg-subtle w-full overflow-hidden text-ellipsis"
+      className="flex flex-wrap items-center gap-2"
     >
-      Variant: {variant?.title}
-    </Text>
+      <span className="text-[11px] uppercase tracking-[0.18em] text-white/40">
+        Modèle
+      </span>
+
+      <span
+        className={clx(
+          "rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/70",
+          "backdrop-blur-xl"
+        )}
+      >
+        {variant.title}
+      </span>
+    </div>
   )
 }
 

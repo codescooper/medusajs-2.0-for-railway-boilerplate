@@ -1,40 +1,69 @@
-import { getCategoriesList } from "@lib/data/categories"
-import { getCollectionsList } from "@lib/data/collections"
+import { listCategories } from "@lib/data/categories"
+import { listCollections } from "@lib/data/collections"
 import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
 
 export default async function Footer() {
-  const { collections } = await getCollectionsList(0, 6)
-  const { product_categories } = await getCategoriesList(0, 6)
+  const { collections } = await listCollections({
+    fields: "*products",
+  })
+
+  const productCategories = await listCategories()
 
   return (
-    <footer className="border-t border-ui-border-base w-full">
-      <div className="content-container flex flex-col w-full">
-        <div className="flex flex-col gap-y-6 xsmall:flex-row items-start justify-between py-40">
-          <div>
-            <LocalizedClientLink
-              href="/"
-              className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
-            >
-              Medusa Store
-            </LocalizedClientLink>
-          </div>
-          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3">
-            {product_categories && product_categories?.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
-                  Categories
+    <footer className="relative mt-16 border-t border-white/10 pt-10 pb-6">
+      <div className="content-container">
+        <div className="section-shell border-gradient-lgv px-6 py-8 md:px-8 md:py-10">
+          <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
+            {/* Marque */}
+            <div>
+              <LocalizedClientLink
+                href="/"
+                className="group inline-flex flex-col leading-none"
+              >
+                <span className="text-[10px] uppercase tracking-[0.28em] text-cyan-300/80">
+                  Optique premium
                 </span>
+                <span className="mt-2 text-base font-semibold uppercase tracking-[0.22em] text-white transition duration-300 group-hover:text-cyan-200 md:text-lg">
+                  La Grande Vision
+                </span>
+              </LocalizedClientLink>
+
+              <p className="mt-5 max-w-[32ch] text-sm leading-7 text-white/70">
+                Votre partenaire pour une vision claire, confortable et élégante,
+                dans un univers moderne, rassurant et haut de gamme.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3">
+                <a
+                  href="https://wa.me/225000000000"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="secondary-btn w-fit !px-4 !py-2 !text-sm"
+                >
+                  WhatsApp
+                </a>
+
+                <div className="text-sm text-white/60">
+                  Abidjan, Côte d'Ivoire
+                </div>
+              </div>
+            </div>
+
+            {/* Catégories */}
+            {productCategories && productCategories?.length > 0 && (
+              <div>
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-white/85">
+                  Catégories
+                </h3>
+
                 <ul
-                  className="grid grid-cols-1 gap-2"
+                  className="grid gap-3 text-sm text-white/65"
                   data-testid="footer-categories"
                 >
-                  {product_categories?.slice(0, 6).map((c) => {
-                    if (c.parent_category) {
-                      return
-                    }
+                  {productCategories?.slice(0, 6).map((c) => {
+                    if (c.parent_category) return null
 
                     const children =
                       c.category_children?.map((child) => ({
@@ -44,34 +73,31 @@ export default async function Footer() {
                       })) || null
 
                     return (
-                      <li
-                        className="flex flex-col gap-2 text-ui-fg-subtle txt-small"
-                        key={c.id}
-                      >
+                      <li key={c.id} className="flex flex-col gap-2">
                         <LocalizedClientLink
                           className={clx(
-                            "hover:text-ui-fg-base",
-                            children && "txt-small-plus"
+                            "nav-link-lgv w-fit text-sm text-white/70",
+                            children && "font-medium text-white"
                           )}
                           href={`/categories/${c.handle}`}
                           data-testid="category-link"
                         >
                           {c.name}
                         </LocalizedClientLink>
+
                         {children && (
-                          <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink
-                                    className="hover:text-ui-fg-base"
-                                    href={`/categories/${child.handle}`}
-                                    data-testid="category-link"
-                                  >
-                                    {child.name}
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
+                          <ul className="ml-3 grid gap-2">
+                            {children.map((child) => (
+                              <li key={child.id}>
+                                <LocalizedClientLink
+                                  className="text-sm text-white/55 transition hover:text-cyan-200"
+                                  href={`/categories/${child.handle}`}
+                                  data-testid="category-link"
+                                >
+                                  {child.name}
+                                </LocalizedClientLink>
+                              </li>
+                            ))}
                           </ul>
                         )}
                       </li>
@@ -80,23 +106,23 @@ export default async function Footer() {
                 </ul>
               </div>
             )}
+
+            {/* Collections */}
             {collections && collections.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
+              <div>
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-white/85">
                   Collections
-                </span>
+                </h3>
+
                 <ul
-                  className={clx(
-                    "grid grid-cols-1 gap-2 text-ui-fg-subtle txt-small",
-                    {
-                      "grid-cols-2": (collections?.length || 0) > 3,
-                    }
-                  )}
+                  className={clx("grid gap-3 text-sm text-white/65", {
+                    "md:grid-cols-2": (collections?.length || 0) > 3,
+                  })}
                 >
                   {collections?.slice(0, 6).map((c) => (
                     <li key={c.id}>
                       <LocalizedClientLink
-                        className="hover:text-ui-fg-base"
+                        className="nav-link-lgv w-fit text-sm text-white/70"
                         href={`/collections/${c.handle}`}
                       >
                         {c.title}
@@ -106,48 +132,86 @@ export default async function Footer() {
                 </ul>
               </div>
             )}
-            <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">Medusa</span>
-              <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
+
+            {/* Liens utiles */}
+            <div>
+              <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-white/85">
+                Liens utiles
+              </h3>
+
+              <ul className="grid gap-3 text-sm text-white/65">
                 <li>
-                  <a
-                    href="https://github.com/medusajs"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-ui-fg-base"
+                  <LocalizedClientLink
+                    href="/store"
+                    className="nav-link-lgv w-fit text-sm text-white/70"
                   >
-                    GitHub
-                  </a>
+                    Boutique
+                  </LocalizedClientLink>
                 </li>
                 <li>
-                  <a
-                    href="https://docs.medusajs.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-ui-fg-base"
+                  <LocalizedClientLink
+                    href="/consultation"
+                    className="nav-link-lgv w-fit text-sm text-white/70"
                   >
-                    Documentation
-                  </a>
+                    Consultation
+                  </LocalizedClientLink>
                 </li>
                 <li>
-                  <a
-                    href="https://github.com/medusajs/nextjs-starter-medusa"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-ui-fg-base"
+                  <LocalizedClientLink
+                    href="/account"
+                    className="nav-link-lgv w-fit text-sm text-white/70"
                   >
-                    Source code
-                  </a>
+                    Mon compte
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/cart"
+                    className="nav-link-lgv w-fit text-sm text-white/70"
+                  >
+                    Panier
+                  </LocalizedClientLink>
+                </li>
+                <li>
+                  <LocalizedClientLink
+                    href="/contact"
+                    className="nav-link-lgv w-fit text-sm text-white/70"
+                  >
+                    Contact
+                  </LocalizedClientLink>
                 </li>
               </ul>
             </div>
           </div>
-        </div>
-        <div className="flex w-full mb-16 justify-between text-ui-fg-muted">
-          <Text className="txt-compact-small">
-            © {new Date().getFullYear()} Medusa Store. All rights reserved.
-          </Text>
-          <MedusaCTA />
+
+          <div className="mt-8 border-t border-white/10 pt-5">
+            <div className="flex flex-col gap-3 text-sm text-white/50 md:flex-row md:items-center md:justify-between">
+              <Text className="text-sm text-white/50">
+                © {new Date().getFullYear()} conçue par AwemA pour La Grande Vision. Tous droits réservés.
+              </Text>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <LocalizedClientLink
+                  href="/mentions-legales"
+                  className="transition hover:text-white/80"
+                >
+                  Mentions légales
+                </LocalizedClientLink>
+                <LocalizedClientLink
+                  href="/politique-confidentialite"
+                  className="transition hover:text-white/80"
+                >
+                  Confidentialité
+                </LocalizedClientLink>
+                <LocalizedClientLink
+                  href="/cgv"
+                  className="transition hover:text-white/80"
+                >
+                  CGV
+                </LocalizedClientLink>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
