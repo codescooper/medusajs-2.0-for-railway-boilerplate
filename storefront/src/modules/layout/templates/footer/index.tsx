@@ -37,7 +37,7 @@ export default async function Footer() {
 
               <div className="mt-6 flex flex-col gap-3">
                 <a
-                  href="https://wa.me/225000000000"
+                  href="https://wa.me/22506021816"
                   target="_blank"
                   rel="noreferrer"
                   className="secondary-btn w-fit !px-4 !py-2 !text-sm"
