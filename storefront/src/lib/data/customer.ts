@@ -103,15 +103,14 @@ export async function login(_currentState: unknown, formData: FormData) {
   const password = formData.get("password") as string
 
   try {
-    await sdk.auth
-      .login("customer", "emailpass", { email, password })
-      .then((token) => {
-        setAuthToken(typeof token === 'string' ? token : token.location)
-        revalidateTag("customer")
-      })
+    const token = await sdk.auth.login("customer", "emailpass", { email, password })
+    await setAuthToken(typeof token === 'string' ? token : token.location)
+    revalidateTag("customer")
   } catch (error: any) {
     return error.toString()
   }
+
+  redirect("/account")
 }
 
 export async function signout(countryCode: string) {
