@@ -42,18 +42,23 @@ export const retrieveCustomer = async (): Promise<
     .catch(() => null)
 }
 
+// FIXED: getAuthHeaders() était spread sans await → retournait une Promise au lieu des headers
+// Le token JWT n'arrivait jamais à l'API → customer toujours null après login
 export const getCustomer = cache(async function () {
+  const authHeaders = await getAuthHeaders()
   return await sdk.store.customer
-    .retrieve({}, { next: { tags: ["customer"] }, ...getAuthHeaders() })
+    .retrieve({}, { next: { tags: ["customer"] }, ...authHeaders })
     .then(({ customer }) => customer)
     .catch(() => null)
 })
 
+// FIXED: même correctif pour updateCustomer
 export const updateCustomer = cache(async function (
   body: HttpTypes.StoreUpdateCustomer
 ) {
+  const authHeaders = await getAuthHeaders()
   const updateRes = await sdk.store.customer
-    .update(body, {}, getAuthHeaders())
+    .update(body, {}, authHeaders)
     .then(({ customer }) => customer)
     .catch(medusaError)
 
@@ -85,13 +90,14 @@ export async function signup(_currentState: unknown, formData: FormData) {
       password,
     })
 
-    await setAuthToken(typeof loginToken === 'string' ? loginToken : loginToken.location)
+    await setAuthToken(typeof loginToken === "string" ? loginToken : loginToken.location)
 
     revalidateTag("customer")
   } catch (error: any) {
     return error.toString()
   }
 
+  // redirect() hors du try/catch — Next.js l'exige (lance NEXT_REDIRECT)
   redirect("/account")
 }
 
@@ -101,23 +107,26 @@ export async function login(_currentState: unknown, formData: FormData) {
 
   try {
     const token = await sdk.auth.login("customer", "emailpass", { email, password })
-    await setAuthToken(typeof token === 'string' ? token : token.location)
+    await setAuthToken(typeof token === "string" ? token : token.location)
     revalidateTag("customer")
   } catch (error: any) {
     return error.toString()
   }
 
+  // redirect() hors du try/catch — Next.js l'exige (lance NEXT_REDIRECT)
   redirect("/account")
 }
 
+// FIXED: removeAuthToken() async non attendu → cookie jamais supprimé à la déconnexion
 export async function signout(countryCode: string) {
   await sdk.auth.logout()
-  removeAuthToken()
+  await removeAuthToken()
   revalidateTag("auth")
   revalidateTag("customer")
   redirect(`/${countryCode}/account`)
 }
 
+// FIXED: getAuthHeaders() await manquant sur toutes les opérations d'adresse
 export const addCustomerAddress = async (
   _currentState: unknown,
   formData: FormData
@@ -135,8 +144,10 @@ export const addCustomerAddress = async (
     phone: formData.get("phone") as string,
   }
 
+  const authHeaders = await getAuthHeaders()
+
   return sdk.store.customer
-    .createAddress(address, {}, getAuthHeaders())
+    .createAddress(address, {}, authHeaders)
     .then(({ customer }) => {
       revalidateTag("customer")
       return { success: true, error: null }
@@ -149,8 +160,10 @@ export const addCustomerAddress = async (
 export const deleteCustomerAddress = async (
   addressId: string
 ): Promise<void> => {
+  const authHeaders = await getAuthHeaders()
+
   await sdk.store.customer
-    .deleteAddress(addressId, getAuthHeaders())
+    .deleteAddress(addressId, authHeaders)
     .then(() => {
       revalidateTag("customer")
       return { success: true, error: null }
@@ -179,8 +192,10 @@ export const updateCustomerAddress = async (
     phone: formData.get("phone") as string,
   }
 
+  const authHeaders = await getAuthHeaders()
+
   return sdk.store.customer
-    .updateAddress(addressId, address, {}, getAuthHeaders())
+    .updateAddress(addressId, address, {}, authHeaders)
     .then(() => {
       revalidateTag("customer")
       return { success: true, error: null }
