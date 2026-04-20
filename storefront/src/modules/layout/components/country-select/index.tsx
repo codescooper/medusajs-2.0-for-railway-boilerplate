@@ -125,10 +125,9 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
                   >
                     {/* @ts-ignore */}
                     <ReactCountryFlag
-                      svg
                       style={{
-                        width: "16px",
-                        height: "16px",
+                        fontSize: "1.1em",
+                        lineHeight: "1",
                       }}
                       countryCode={o?.country ?? ""}
                     />

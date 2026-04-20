@@ -127,8 +127,7 @@ const LanguageSelect = ({
               <span className="flex items-center gap-x-2 text-white">
                 {current.countryCode && (
                   <ReactCountryFlag
-                    svg
-                    style={{ width: "16px", height: "16px" }}
+                    style={{ fontSize: "1.1em", lineHeight: "1" }}
                     countryCode={current.countryCode}
                   />
                 )}
@@ -172,8 +171,7 @@ const LanguageSelect = ({
                   >
                     {o.countryCode ? (
                       <ReactCountryFlag
-                        svg
-                        style={{ width: "16px", height: "16px" }}
+                        style={{ fontSize: "1.1em", lineHeight: "1" }}
                         countryCode={o.countryCode}
                       />
                     ) : (

@@ -77,25 +77,22 @@ export async function signup(_currentState: unknown, formData: FormData) {
     })
 
     const customHeaders = { authorization: `Bearer ${token}` }
-    
-    const { customer: createdCustomer } = await sdk.store.customer.create(
-      customerForm,
-      {},
-      customHeaders
-    )
+
+    await sdk.store.customer.create(customerForm, {}, customHeaders)
 
     const loginToken = await sdk.auth.login("customer", "emailpass", {
       email: customerForm.email,
       password,
     })
 
-    setAuthToken(typeof loginToken === 'string' ? loginToken : loginToken.location)
+    await setAuthToken(typeof loginToken === 'string' ? loginToken : loginToken.location)
 
     revalidateTag("customer")
-    return createdCustomer
   } catch (error: any) {
     return error.toString()
   }
+
+  redirect("/account")
 }
 
 export async function login(_currentState: unknown, formData: FormData) {
