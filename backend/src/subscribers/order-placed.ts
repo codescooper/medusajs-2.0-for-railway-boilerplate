@@ -1,4 +1,4 @@
-import { Modules } from '@medusajs/framework/utils'
+import { ContainerRegistrationKeys, Modules } from '@medusajs/framework/utils'
 import { INotificationModuleService, IOrderModuleService } from '@medusajs/framework/types'
 import { SubscriberArgs, SubscriberConfig } from '@medusajs/medusa'
 import { EmailTemplates } from '../modules/email-notifications/templates'
@@ -7,11 +7,12 @@ export default async function orderPlacedHandler({
   event: { data },
   container,
 }: SubscriberArgs<any>) {
+  const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const notificationModuleService: INotificationModuleService = container.resolve(Modules.NOTIFICATION)
   const orderModuleService: IOrderModuleService = container.resolve(Modules.ORDER)
-  
+
   const order = await orderModuleService.retrieveOrder(data.id, { relations: ['items', 'summary', 'shipping_address'] })
-  const shippingAddress = await (orderModuleService as any).orderAddressService_.retrieve(order.shipping_address.id)
+  const shippingAddress = order.shipping_address
 
   try {
     await notificationModuleService.createNotifications({
@@ -29,7 +30,7 @@ export default async function orderPlacedHandler({
       }
     })
   } catch (error) {
-    console.error('Error sending order confirmation notification:', error)
+    logger.error(`Error sending order confirmation notification: ${error.message}`)
   }
 }
 

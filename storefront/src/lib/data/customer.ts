@@ -25,7 +25,7 @@ export const retrieveCustomer = async (): Promise<
   }
 
   const next = {
-    ...(await getCacheOptions("customers")),
+    ...(await getCacheOptions("customer")),
   }
 
   return await sdk.client
@@ -81,7 +81,8 @@ export async function signup(_currentState: unknown, formData: FormData) {
       password: password,
     })
 
-    const customHeaders = { authorization: `Bearer ${token}` }
+    const registerToken = typeof token === "string" ? token : token.location
+    const customHeaders = { authorization: `Bearer ${registerToken}` }
 
     await sdk.store.customer.create(customerForm, {}, customHeaders)
 
