@@ -17,7 +17,12 @@ export interface OrderPlacedTemplateProps {
 }
 
 export const isOrderPlacedTemplateData = (data: any): data is OrderPlacedTemplateProps =>
-  typeof data.order === 'object' && typeof data.shippingAddress === 'object'
+  typeof data?.order === 'object' &&
+  data.order !== null &&
+  typeof data?.shippingAddress === 'object' &&
+  data.shippingAddress !== null &&
+  typeof data.order.summary === 'object' &&
+  Array.isArray(data.order.items)
 
 export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
   PreviewProps: OrderPlacedPreviewProps

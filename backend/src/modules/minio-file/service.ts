@@ -21,6 +21,7 @@ interface MinioServiceConfig {
   accessKey: string
   secretKey: string
   bucket?: string
+  publicRead?: boolean
 }
 
 export interface MinioFileProviderOptions {
@@ -28,6 +29,10 @@ export interface MinioFileProviderOptions {
   accessKey: string
   secretKey: string
   bucket?: string
+  // Whether newly created buckets get a public-read policy. Defaults to true so
+  // product images are served directly. Set to false to keep uploads private
+  // (use the presigned-url methods to access them).
+  publicRead?: boolean
 }
 
 const DEFAULT_BUCKET = 'medusa-media'
@@ -42,6 +47,7 @@ class MinioFileProviderService extends AbstractFileProviderService {
   protected client: Client
   protected readonly bucket: string
   protected readonly useSSL: boolean
+  protected readonly publicRead: boolean
 
   constructor({ logger }: InjectedDependencies, options: MinioFileProviderOptions) {
     super()
@@ -77,12 +83,15 @@ class MinioFileProviderService extends AbstractFileProviderService {
       endPoint: endPoint,
       accessKey: options.accessKey,
       secretKey: options.secretKey,
-      bucket: options.bucket
+      bucket: options.bucket,
+      publicRead: options.publicRead
     }
 
     // Use provided bucket or default
     this.bucket = this.config_.bucket || DEFAULT_BUCKET
     this.useSSL = useSSL
+    // Default to public-read so product images are served directly.
+    this.publicRead = options.publicRead !== false
     this.logger_.info(`MinIO service initialized with bucket: ${this.bucket}, endpoint: ${endPoint}, port: ${port}, SSL: ${useSSL}`)
 
     // Initialize Minio client with parsed settings
@@ -121,33 +130,16 @@ class MinioFileProviderService extends AbstractFileProviderService {
     try {
       // Check if bucket exists
       const bucketExists = await this.client.bucketExists(this.bucket)
-      
+
       if (!bucketExists) {
         // Create the bucket
         await this.client.makeBucket(this.bucket)
         this.logger_.info(`Created bucket: ${this.bucket}`)
 
-        // Set bucket policy to allow public read access
-        const policy = {
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Sid: 'PublicRead',
-              Effect: 'Allow',
-              Principal: '*',
-              Action: ['s3:GetObject'],
-              Resource: [`arn:aws:s3:::${this.bucket}/*`]
-            }
-          ]
-        }
-
-        await this.client.setBucketPolicy(this.bucket, JSON.stringify(policy))
-        this.logger_.info(`Set public read policy for bucket: ${this.bucket}`)
-      } else {
-        this.logger_.info(`Using existing bucket: ${this.bucket}`)
-        
-        // Verify/update policy on existing bucket
-        try {
+        // Only newly created buckets get a policy applied, and only when
+        // publicRead is enabled. Existing buckets are left untouched so a
+        // user-defined (possibly stricter) policy is never silently clobbered.
+        if (this.publicRead) {
           const policy = {
             Version: '2012-10-17',
             Statement: [
@@ -160,11 +152,12 @@ class MinioFileProviderService extends AbstractFileProviderService {
               }
             ]
           }
+
           await this.client.setBucketPolicy(this.bucket, JSON.stringify(policy))
-          this.logger_.info(`Updated public read policy for existing bucket: ${this.bucket}`)
-        } catch (policyError) {
-          this.logger_.warn(`Failed to update policy for existing bucket: ${policyError.message}`)
+          this.logger_.info(`Set public read policy for bucket: ${this.bucket}`)
         }
+      } else {
+        this.logger_.info(`Using existing bucket: ${this.bucket} (policy left as-is)`)
       }
     } catch (error) {
       this.logger_.error(`Error initializing bucket: ${error.message}`)
@@ -209,17 +202,20 @@ class MinioFileProviderService extends AbstractFileProviderService {
         content = Buffer.from(file.content as any)
       }
 
-      // Upload file with public-read access
+      const metaData: Record<string, string> = {
+        'Content-Type': file.mimeType,
+        'x-amz-meta-original-filename': file.filename
+      }
+      if (this.publicRead) {
+        metaData['x-amz-acl'] = 'public-read'
+      }
+
       await this.client.putObject(
         this.bucket,
         fileKey,
         content,
         content.length,
-        {
-          'Content-Type': file.mimeType,
-          'x-amz-meta-original-filename': file.filename,
-          'x-amz-acl': 'public-read'
-        }
+        metaData
       )
 
       // Generate URL using the endpoint and bucket with correct protocol

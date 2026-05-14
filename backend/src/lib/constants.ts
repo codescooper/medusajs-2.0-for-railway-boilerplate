@@ -10,9 +10,29 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 export const IS_DEV = process.env.NODE_ENV === 'development'
 
 /**
- * Public URL for the backend
+ * Public URL for the backend.
+ * Railway exposes the deployed host (without scheme) as RAILWAY_PUBLIC_DOMAIN.
  */
-export const BACKEND_URL = process.env.BACKEND_PUBLIC_URL ?? process.env.RAILWAY_PUBLIC_DOMAIN_VALUE ?? 'http://localhost:9000'
+const RAILWAY_PUBLIC_URL = process.env.RAILWAY_PUBLIC_DOMAIN
+  ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+  : undefined
+
+export const BACKEND_URL =
+  process.env.BACKEND_PUBLIC_URL ?? RAILWAY_PUBLIC_URL ?? 'http://localhost:9000'
+
+/**
+ * Reject known-weak secret values outside of development so they cannot
+ * silently ship to production (e.g. the placeholder from .env.template).
+ */
+function assertStrongSecret(value: string, name: string): string {
+  const weak = ['supersecret', 'secret', 'changeme', 'something']
+  if (!IS_DEV && weak.includes(value.trim().toLowerCase())) {
+    throw new Error(
+      `Environment variable ${name} is set to a known-weak value. Set a strong, unique secret.`,
+    )
+  }
+  return value
+}
 
 /**
  * Database URL for Postgres instance used by the backend
@@ -42,20 +62,36 @@ export const AUTH_CORS = process.env.AUTH_CORS;
  */
 export const STORE_CORS = process.env.STORE_CORS;
 
+// CORS origins are security-relevant. Outside of development, a missing value
+// means the admin dashboard / storefront cannot reach the API — warn loudly.
+if (!IS_DEV) {
+  for (const [name, value] of Object.entries({ ADMIN_CORS, AUTH_CORS, STORE_CORS })) {
+    if (!value || value.trim() === '') {
+      console.warn(`[config] ${name} is not set — cross-origin requests for this scope will be blocked.`)
+    }
+  }
+}
+
 /**
  * JWT Secret used for signing JWT tokens
  */
-export const JWT_SECRET = assertValue(
-  process.env.JWT_SECRET,
-  'Environment variable for JWT_SECRET is not set',
+export const JWT_SECRET = assertStrongSecret(
+  assertValue(
+    process.env.JWT_SECRET,
+    'Environment variable for JWT_SECRET is not set',
+  ),
+  'JWT_SECRET',
 )
 
 /**
  * Cookie secret used for signing cookies
  */
-export const COOKIE_SECRET = assertValue(
-  process.env.COOKIE_SECRET,
-  'Environment variable for COOKIE_SECRET is not set',
+export const COOKIE_SECRET = assertStrongSecret(
+  assertValue(
+    process.env.COOKIE_SECRET,
+    'Environment variable for COOKIE_SECRET is not set',
+  ),
+  'COOKIE_SECRET',
 )
 
 /**
